@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 // Route::get('/param/{cpf}/{password}', 'AuthController@register');
 
 Route::post('register', 'AuthController@register');
-Route::get('login/{cpf}/{password}', 'AuthController@login')->name('api.login');
+Route::get('login', 'AuthController@login')->name('api.login');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('user', 'AuthController@user')->name('api.user');
