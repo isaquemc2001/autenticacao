@@ -43,6 +43,27 @@ class AuthController extends Controller
     public function login(Request $request)
     {
 
+        $dados = request(['cpf', 'password']);
+        // if (!Auth::attempt($dados)) {
+        //     return response()->json([
+        //         'status_code' => 500,
+        //         'message' => 'Unauthorized'
+        //     ]);
+        // }
+        $user = User::where('cpf', $request->cpf)->first();
+
+        if (Hash::check($request->password, $user->password)) {
+            $tokenResult = $user->createToken('authToken')->plainTextToken;
+
+            return response()->json([
+                'token' => $tokenResult
+            ], JsonResponse::HTTP_ACCEPTED);
+        }
+    }
+
+    public function loginAntigo(Request $request)
+    {
+
         $cpf = $request->cpf;
         $password = $request->password;
 
@@ -71,7 +92,16 @@ class AuthController extends Controller
         // ])->withCookie($cookie);
     }
 
-    public function logout()
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Token deleted'
+        ]);
+    }
+    
+    public function logoutAntigo()
     {
         $cookie = Cookie::forget('jwt');
 
