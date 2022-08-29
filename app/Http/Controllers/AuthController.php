@@ -22,8 +22,8 @@ class AuthController extends Controller
         // exit;
 
         $cpf_banco = User::select('cpf')->where('cpf', $cpf)->get()->first();
-        
-        if (isset($cpf_banco['cpf']) == null){
+
+        if (isset($cpf_banco['cpf']) == null) {
             $cpf_banco['cpf'] = '';
         }
 
@@ -42,42 +42,40 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        // $dados = request(['cpf', 'password']);
+        // // if (!Auth::attempt($dados)) {
+        // //     return response()->json([
+        // //         'status_code' => 500,
+        // //         'message' => 'Unauthorized'
+        // //     ]);
+        // // }
+        $user = User::where('cpf', $request->cpf)->first();
+        
+        if (Hash::check($request->password, $user->password)) {
+            $tokenResult = $user->createToken('authToken')->plainTextToken;
 
-        $cpf = $request->cpf;
-        $password = $request->password;
+            $cookie = cookie('jwt', $tokenResult, 60);
 
-        if (!Auth::attempt(json_decode($mydados, true))) {
-            return response([
-                'message' => 'Credencias inválidas',
-            ], JsonResponse::HTTP_UNAUTHORIZED);
+            return response()->json([
+                'token' => $tokenResult
+            ], JsonResponse::HTTP_ACCEPTED)->withCookie($cookie);
         }
-
-        $user = Auth::user();
-
-        $token = $user->createToken('token')->plainTextToken;
-
-        $cookie = cookie('jwt', $token, 60);
-
-        return redirect()->route('api.user')->withCookie($cookie);
-
-        // $user = Auth::table('usuario')->select()->guard('api');
-
-        // $token = $user->createToken('token')->plainTextToken;
-
-        // $cookie = cookie('jwt', $token, 60);
-
-        // return response([
-        //     'message' => 'Sucesso'
-        // ])->withCookie($cookie);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
         $cookie = Cookie::forget('jwt');
 
         return response([
             'message' => 'Sucesso'
         ])->withCookie($cookie);
+
+        // $request->user()->currentAccessToken()->delete();
+        // return response()->json([
+        //     'status_code' => 200,
+        //     'message' => 'Token deleted'
+        // ]);
+
     }
 
     public function user()
