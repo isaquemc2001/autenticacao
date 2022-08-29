@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response as HttpFoundationResponse;
 
 class AuthController extends Controller
 {
@@ -18,37 +17,34 @@ class AuthController extends Controller
     public function register(Request $request)
     {
 
-        
-        echo $cpf =  $request->cpf; '<br>';
-        echo $password = $request->password;
-        exit;
-
-        $cpf_banco = User::select('cpf')->where('cpf', $cpf)->get()->first();
-        // echo $cpf_banco['cpf'];
+        $cpf =  $request->cpf;
+        $password = $request->password;
         // exit;
 
-        if ($cpf_banco['cpf'] == $cpf) {
-            return "erro";
+        $cpf_banco = User::select('cpf')->where('cpf', $cpf)->get()->first();
+        
+        if (isset($cpf_banco['cpf']) == null){
+            $cpf_banco['cpf'] = '';
+        }
+
+        if ($cpf_banco['cpf'] == isset($cpf)) {
+            return response()->json(['msg' => 'Usuário Já Cadastrado'], JsonResponse::HTTP_UNAUTHORIZED);
         } else {
             User::create([
                 'cpf' => $cpf,
-                'password' => Hash::make($pas)
+                'password' => Hash::make($password)
             ]);
-            return redirect()->route('api.login', ['cpf' => $cpf, 'password' => $password]);
+            return response()->json(['msg' => 'Usuário Cadastrado'], JsonResponse::HTTP_ACCEPTED);
         }
 
         // return $user;
     }
 
-    public function login(Request $request, String $cpf, String $password)
+    public function login(Request $request)
     {
 
-        $dados = (object) [
-            'cpf' => $cpf,
-            'password' => $password
-        ];
-
-        $mydados = json_encode($dados);
+        $cpf = $request->cpf;
+        $password = $request->password;
 
         if (!Auth::attempt(json_decode($mydados, true))) {
             return response([
