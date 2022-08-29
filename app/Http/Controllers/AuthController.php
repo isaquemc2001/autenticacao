@@ -59,6 +59,10 @@ class AuthController extends Controller
             return response()->json([
                 'token' => $tokenResult
             ], JsonResponse::HTTP_ACCEPTED)->withCookie($cookie);
+        }else{
+            return response()->json([
+                'msg' => 'Senha inválida'
+            ], JsonResponse::HTTP_UNAUTHORIZED);
         }
     }
 
