@@ -18,8 +18,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('register', 'AuthController@register');
 Route::post('login', 'AuthController@login')->name('api.login');
-Route::post('logout', 'AuthController@logout');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('user', 'AuthController@user')->name('api.user');
+    Route::get('logout', 'AuthController@logout');
 });

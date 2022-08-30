@@ -70,9 +70,9 @@ class AuthController extends Controller
     {
         $cookie = Cookie::forget('jwt');
 
-        return response([
-            'message' => 'Sucesso'
-        ])->withCookie($cookie);
+        return response()->json([
+            'msg' => 'Sucesso'
+        ], JsonResponse::HTTP_ACCEPTED)->withCookie($cookie);
 
         // $request->user()->currentAccessToken()->delete();
         // return response()->json([
